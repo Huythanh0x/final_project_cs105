@@ -1,13 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <canvas id="background"></canvas>
-    <script type="module" src="/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- <link rel="stylesheet" href="style.css"> -->
+  <title>Vite App</title>
+</head>
+
+<body>
+  <canvas id="background"></canvas>
+  <div class="container">
+    <p style="font-size: 20px;">CS105 SIMULATE 3D OBJECT</p>
+    <div class="sidebar list_object">
+      <p>OBJECT</p>
+      <div>
+        <img class="georaphy button active" src="images/84583.png">
+      </div>
+      <div>
+        <img class="georaphy button" src="images/274401.png">
+      </div>
+      <div>
+        <img class="georaphy button" src="images/136829.png">
+      </div>
+      <div>
+        <img class="georaphy button" src="images/img_528551.png">
+      </div>
+      <div>
+        <img class="georaphy button" src="images/405763-200.png">
+      </div>
+      <div>
+        <!-- <img class="georaphy button" src="images/6892-200.png"> -->
+      </div>
+      <div>
+        <img class="georaphy button" src="images/6181141.png">
+      </div>
+      <div>
+        <!-- <img class="georaphy button" src="images/342-3427139_a-regular-icosahedron-icosaedro-regular.png"> -->
+      </div>
+      <div>
+        <img class="georaphy button" src="images/heart-outline.png">
+      </div>
+    </div>
+    <div class="sidebar list_texture" style="margin-top: 30px;">
+      <p>TEXTURE</p>
+      <div>
+        <img class="texture button active" src="texture/point.png">
+      </div>
+      <div>
+        <img class="texture button" src="texture/line.png">
+      </div>
+      <div>
+        <img class="texture button" src="texture/solid.png">
+      </div>
+      <div>
+        <img class="texture button" src="texture/water.jpg">
+      </div>
+      <div>
+        <img class="texture button" src="texture/galaxy.png">
+      </div>
+    </div>
+    <div class="light column">
+      <div>
+        <img class="light_switch button" src="images/light_on.png">
+      </div>
+      <div>
+        <img class="light_switch button" src="images/light_off.png">
+      </div>
+    </div>
+    <div class="sidebar list_changes" style="margin-top: 20px;">
+      <p>CHANGE</p>
+      <div>
+        <img class="change button active" src="images/translate.png">
+      </div>
+      <div>
+        <img class="change button" src="images/rotate.png">
+      </div>
+      <div>
+        <img class="change button" src="images/epxand.webp">
+      </div>
+      <div>
+        <img class="change button" src="images/light_translate.png">
+      </div>
+      <div>
+        <img class="change button" src="images/camera_translate.png">
+      </div>
+    </div>
+  </div>
+
+
+  <script type="module" src="/main.js"></script>
+</body>
+
 </html>
