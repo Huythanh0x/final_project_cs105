@@ -1,10 +1,10 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { MeshBasicMaterial } from 'three'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 let animationType = 0
 let alpha = 0
-
+let hasLight = false
 function animate() {
     requestAnimationFrame(animate)
     if (animationType == 1) {
@@ -42,6 +42,9 @@ function handleClickInListButton(type) {
             if (type.includes("animation")) {
                 updateAnimation(addChange.getAttribute("name"))
             }
+            if (type.includes("change")) {
+                updateTransformControles(addChange.getAttribute("name"))
+            }
         })
     })
 
@@ -67,6 +70,34 @@ function updateAnimation(animationName) {
     }
 }
 
+function updateTransformControles(controlType) {
+    console.log(controlType)
+    transformControls.detach(mesh)
+    transformControls.detach(pointLight)
+    switch (controlType) {
+        case "translate":
+            transformControls.attach(mesh)
+            transformControls.setMode("translate")
+            break
+        case "rotate":
+            transformControls.attach(mesh)
+            transformControls.setMode("rotate")
+            break
+        case "expand":
+            transformControls.attach(mesh)
+            transformControls.setMode("scale")
+            break
+        case "light_translate":
+            transformControls.attach(pointLight)
+            transformControls.setMode("translate")
+            break
+        default:
+            console.log("default")
+            break
+    }
+    scene.add(transformControls)
+}
+
 function updateMaterial(materialName) {
     if (!materialName.includes("point") && !materialName.includes("line") && !materialName.includes("solid")) {
         materialName = "texture/" + materialName + ".jpg"
@@ -85,6 +116,7 @@ function updateMaterial(materialName) {
     }
     scene.remove(scene.getObjectByName("geometry"))
     mesh.name = "geometry"
+    mesh.castShadow = true
     scene.add(mesh)
 
 }
@@ -133,7 +165,22 @@ function updateMesh(geometryName) {
     }
     mesh = new THREE.Mesh(geometry, material);
     mesh.name = "geometry"
+    mesh.castShadow = true
     scene.add(mesh);
+}
+
+function getPlane(size) {
+    let texture = new THREE.TextureLoader().load("texture/wood.jfif")
+    var geometry = new THREE.PlaneGeometry(size, size);
+    var material = new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        map: texture
+    });
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.receiveShadow = true; // Receive shadow (Nhận đỗ bóng).
+    mesh.rotation.x = Math.PI / 2;
+    mesh.name = "Plane";
+    return mesh;
 }
 
 function resetAll() {
@@ -141,6 +188,8 @@ function resetAll() {
     resetActiveButton("animation")
     updateMaterial("solid")
     resetActiveButton("material")
+    resetActiveButton("change")
+    updateTransformControles("null")
 }
 
 function resetActiveButton(buttonType) {
@@ -166,28 +215,38 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 camera.position.setZ(30)
 camera.position.setY(10)
 
-//! add light
-const pointLight = new THREE.PointLight(0xFFFFFF)
-pointLight.position.set(55, 55, 55)
-const ambientLight = new THREE.AmbientLight(0xFFFFFF)
-scene.add(pointLight, ambientLight)
-
-// ! add light and gridHelper
-const lightHelper = new THREE.PointLightHelper(pointLight)
-const gridHelper = new THREE.GridHelper(200, 50)
-scene.add(lightHelper, gridHelper)
-const controls = new OrbitControls(camera, renderer.domElement)
-
 // inital Mesh
 let geometry = new THREE.BoxGeometry(5, 5, 5);
 let material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 let mesh = new THREE.Mesh(geometry, material);
 mesh.name = "geometry"
+mesh.castShadow = true
 scene.add(mesh);
+
+
+//! add light
+const pointLight = new THREE.PointLight(0xffffff, 10, 100)
+pointLight.position.set(5, 10, 10)
+const ambientLight = new THREE.AmbientLight(0x993399)
+scene.add(pointLight, ambientLight)
+
+// ! add light and gridHelper
+const controls = new OrbitControls(camera, renderer.domElement)
+const lightHelper = new THREE.PointLightHelper(pointLight)
+const gridHelper = new THREE.GridHelper(200, 50)
+// var plane = getPlane(300);
+// gridHelper.add(plane);
+scene.add(lightHelper, gridHelper)
+
+var transformControls = new TransformControls(camera, renderer.domElement);
+transformControls.size = 0.5;
+transformControls.addEventListener("dragging-changed", (event) => {
+    controls.enabled = !event.value;
+});
 
 animate()
 handleClickInListButton("material")
 handleClickInListButton("light_switch")
-handleClickInListButton("change")
 handleClickInListButton("geometry")
 handleClickInListButton("animation")
+handleClickInListButton("change")
