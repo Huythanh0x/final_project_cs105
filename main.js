@@ -3,21 +3,23 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 let animationType = 0
-let alpha = 0
 let hasLight = false
+let currentChange = "null"
+
+
 function animate() {
     requestAnimationFrame(animate)
     if (animationType == 1) {
-        mesh.rotation.x += 0.03
-        mesh.rotation.y += 0.005
-        mesh.rotation.z += 0.01
+        mesh.rotation.x = Date.now() * 0.002
+        mesh.rotation.y = Date.now() * 0.005
+        mesh.rotation.z = Date.now() * 0.001
     } else if (animationType == 2) {
-        mesh.rotation.x += 0.03
+        mesh.rotation.x = Date.now() * 0.002
         mesh.position.y = (Math.sin(Date.now() * 0.002) + 1) * 10;
-        mesh.rotation.z += 0.01
+        mesh.rotation.z = Date.now() * 0.002
     } else if (animationType == 3) {
-        mesh.rotation.x += 0.01
-        mesh.position.y = (Math.cos(Date.now() * 0.002) + 0) * 10
+        mesh.rotation.x = Date.now() * 0.001
+        mesh.position.x = (Math.cos(Date.now() * 0.002) + 0) * 10
     }
     controls.update()
     renderer.render(scene, camera)
@@ -25,7 +27,6 @@ function animate() {
 
 function handleClickInListButton(type) {
     type = "img." + type
-
     let changeList = document.querySelectorAll(type)
     changeList.forEach(addChange => {
         addChange.addEventListener("click", e => {
@@ -33,6 +34,7 @@ function handleClickInListButton(type) {
                 removeChange.classList.remove("active")
             })
             addChange.classList.add("active")
+            currentChange = addChange.getAttribute("name")
             if (type.includes("geometry")) {
                 updateMesh(addChange.getAttribute("name"))
             }
@@ -47,7 +49,6 @@ function handleClickInListButton(type) {
             }
         })
     })
-
 }
 
 function updateAnimation(animationName) {
@@ -92,13 +93,14 @@ function updateTransformControles(controlType) {
             transformControls.setMode("translate")
             break
         default:
-            console.log("default")
             break
     }
     scene.add(transformControls)
 }
 
 function updateMaterial(materialName) {
+    resetActiveButton("change")
+    updateTransformControles(currentChange)
     if (!materialName.includes("point") && !materialName.includes("line") && !materialName.includes("solid")) {
         materialName = "texture/" + materialName + ".jpg"
         let texture = new THREE.TextureLoader().load(materialName)
@@ -118,22 +120,6 @@ function updateMaterial(materialName) {
     mesh.name = "geometry"
     mesh.castShadow = true
     scene.add(mesh)
-
-}
-
-function getHeart() {
-    const x = -10,
-        y = -10;
-    var heartShape = new THREE.Shape();
-    heartShape.moveTo(x + 5, y + 5);
-    heartShape.bezierCurveTo(x + 5, y + 5, x + 4, y, x, y);
-    heartShape.bezierCurveTo(x - 6, y, x - 6, y + 7, x - 6, y + 7);
-    heartShape.bezierCurveTo(x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19);
-    heartShape.bezierCurveTo(x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7);
-    heartShape.bezierCurveTo(x + 16, y + 7, x + 16, y, x + 10, y);
-    heartShape.bezierCurveTo(x + 7, y, x + 5, y + 5, x + 5, y + 5);
-
-    return heartShape;
 }
 
 function updateMesh(geometryName) {
@@ -167,6 +153,21 @@ function updateMesh(geometryName) {
     mesh.name = "geometry"
     mesh.castShadow = true
     scene.add(mesh);
+}
+
+function getHeart() {
+    const x = -10,
+        y = -10;
+    var heartShape = new THREE.Shape();
+    heartShape.moveTo(x + 5, y + 5);
+    heartShape.bezierCurveTo(x + 5, y + 5, x + 4, y, x, y);
+    heartShape.bezierCurveTo(x - 6, y, x - 6, y + 7, x - 6, y + 7);
+    heartShape.bezierCurveTo(x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19);
+    heartShape.bezierCurveTo(x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7);
+    heartShape.bezierCurveTo(x + 16, y + 7, x + 16, y, x + 10, y);
+    heartShape.bezierCurveTo(x + 7, y, x + 5, y + 5, x + 5, y + 5);
+
+    return heartShape;
 }
 
 function getPlane(size) {
