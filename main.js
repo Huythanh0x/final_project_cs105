@@ -2,9 +2,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 let animationType = 0
-let hasLight = false
 let currentChange = "null"
-
 
 function animate() {
     requestAnimationFrame(animate)
@@ -45,6 +43,8 @@ function handleClickInListButton(type) {
             }
             if (type.includes("change")) {
                 updateTransformControles(addChange.getAttribute("name"))
+            } if(type.includes("light_switch")){
+                updateLight(addChange.getAttribute('name'))
             }
         })
     })
@@ -71,7 +71,6 @@ function updateAnimation(animationName) {
 }
 
 function updateTransformControles(controlType) {
-    console.log(controlType)
     transformControls.detach(mesh)
     transformControls.detach(pointLight)
     switch (controlType) {
@@ -122,7 +121,6 @@ function updateMaterial(materialName) {
 }
 
 function updateMesh(geometryName) {
-    console.log(geometryName)
     resetAll()
     scene.remove(scene.getObjectByName("geometry"));
     switch (geometryName) {
@@ -154,6 +152,14 @@ function updateMesh(geometryName) {
     scene.add(mesh);
 }
 
+function updateLight(switchName){
+    if(switchName == "on"){
+        scene.add(floorMesh)
+    }else{
+        scene.remove(scene.getObjectByName("floorMesh"))
+    }
+}
+
 function getHeart() {
     const x = -10,
         y = -10;
@@ -167,20 +173,6 @@ function getHeart() {
     heartShape.bezierCurveTo(x + 7, y, x + 5, y + 5, x + 5, y + 5);
 
     return heartShape;
-}
-
-function getPlane(size) {
-    let texture = new THREE.TextureLoader().load("texture/wood.jfif")
-    var geometry = new THREE.PlaneGeometry(size, size);
-    var material = new THREE.MeshStandardMaterial({
-        side: THREE.DoubleSide,
-        map: texture
-    });
-    var mesh = new THREE.Mesh(geometry, material);
-    mesh.receiveShadow = true; // Receive shadow (Nhận đỗ bóng).
-    mesh.rotation.x = Math.PI / 2;
-    mesh.name = "Plane";
-    return mesh;
 }
 
 function resetAll() {
@@ -202,6 +194,13 @@ function resetActiveButton(buttonType) {
     defaultMaterial.classList.add("active")
 }
 
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.render(scene, camera)
+}
+
 // setUp scene,camera,renderer
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -210,6 +209,9 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
+// renderer shadow map
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 // setUp camera position
 camera.position.setZ(30)
@@ -223,20 +225,28 @@ mesh.name = "geometry"
 mesh.castShadow = true
 scene.add(mesh);
 
-
-//! add light
-const pointLight = new THREE.PointLight(0xffffff, 10, 100)
+// add light
+const pointLight = new THREE.PointLight(0xffffff, 10, 50)
 pointLight.position.set(5, 10, 10)
+pointLight.castShadow = true
 const ambientLight = new THREE.AmbientLight(0x993399)
 scene.add(pointLight, ambientLight)
 
-// ! add light and gridHelper
+// add lightHelper and gridHelper
 const controls = new OrbitControls(camera, renderer.domElement)
 const lightHelper = new THREE.PointLightHelper(pointLight)
 const gridHelper = new THREE.GridHelper(200, 50)
-// var plane = getPlane(300);
-// gridHelper.add(plane);
 scene.add(lightHelper, gridHelper)
+
+// floor
+let floorGeometry = new THREE.PlaneBufferGeometry(200, 200, 200, 200)
+let floorMat = new THREE.MeshPhongMaterial({ color: 0x222222, side: THREE.DoubleSide })
+let floorMesh = new THREE.Mesh(floorGeometry, floorMat)
+floorMesh.rotation.x = -Math.PI / 2
+floorMesh.position.y = 0
+floorMesh.receiveShadow = true
+mesh.receiveShadow = false
+floorMesh.name = "floorMesh"
 
 var transformControls = new TransformControls(camera, renderer.domElement);
 transformControls.size = 0.5;
@@ -250,3 +260,4 @@ handleClickInListButton("light_switch")
 handleClickInListButton("geometry")
 handleClickInListButton("animation")
 handleClickInListButton("change")
+window.addEventListener('resize', onWindowResize, false)
