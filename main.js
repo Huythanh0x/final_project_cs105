@@ -3,11 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 let animationType = 0
 let currentChange = "null"
-let delta = 0.2
-let old_x = 0.0
-let old_y = 0.0
-let delta_x = 0.0
-let delta_y = 0.0
+let old_sin = 0.0
+let sign = 1
 
 function animate() {
     requestAnimationFrame(animate)
@@ -20,40 +17,17 @@ function animate() {
         mesh.position.y = (Math.sin(Date.now() * 0.002) + 1) * 10;
         mesh.rotation.z = Date.now() * 0.002
     } else if (animationType == 3) {
-        // mesh.rotation.x = Date.now() * 0.001
-        // mesh.position.x = (Math.cos(Date.now() * 0.002) + 0) * 10
-		let R = 8
-		// sign of delta
-		let sign = 1 // positive
-		if (delta < 0)
-			sign = -1 // negative
-
-		let x = delta_x
-		let y = R + delta_y
-		// round x to 1 digit to get high precision
-		x = Math.round(x * 10) / 10 + delta
-		y = sign * Math.sqrt(Math.pow(R, 2) - Math.pow(x - R, 2)) + R
-		delta_x = x
-		delta_y = y - R
-
-		mesh.position.x = old_x + delta_x
-		mesh.position.y = old_y + delta_y
-		// config delta when x == 0 or x == 2*R
-		if (x <= 0)
-			delta = 0.2
-		else if (x >= R * 2)
-			delta = -0.2
-		
-		// console.log("x = ", mesh.position.x)
-		// console.log("y = ", mesh.position.y)
+        let sin_theta = Math.sin(Date.now()*0.002)
+        if (sin_theta > 0 && sin_theta < old_sin) {
+            sign = 1
+        } else if (sin_theta < 0 && sin_theta > old_sin) {
+            sign = -1
+        }
+        mesh.position.x = sin_theta * 5
+        mesh.position.z = sign * Math.sqrt(25-Math.pow(mesh.position.x,2))
+        old_sin = sin_theta
    }
-	if (animationType != 3) {
-		old_x = mesh.position.x
-		old_y = mesh.position.y
-		delta_x = 0.0
-		delta_y = 0.0
-		delta = 0.2
-	}
+
     controls.update()
     renderer.render(scene, camera)
 }
